@@ -1,0 +1,118 @@
+
+name: Java CI with Maven and push to AKS
+
+
+env:
+  AZURE_CONTAINER_REGISTRY: MY_REGISTRY_NAME # set this to the name of your container registry
+  PROJECT_NAME: MY_PROJECT_NAME              # set this to your project's name
+  RESOURCE_GROUP: MY_RESOURCE_GROUP          # set this to the resource group containing your AKS cluster
+  CLUSTER_NAME: MY_CLUSTER_NAME              # set this to the name of your AKS cluster
+  REGISTRY_URL: MY_REGISTRY_URL              # set this to the URL of your registry
+  # If you bake using helm:
+  CHART_PATH: MY_HELM_FILE                   # set this to the path to your helm file
+  CHART_OVERRIDE_PATH: MY_OVERRIDE_FILES     # set this to an array of override file paths
+  
+    IMAGE_NAME: ${{ github.repository_owner }}/trivy-checks-act
+  REGISTRY: ghcr.io
+
+  
+on:
+  push:
+    branches: [ "main" ]
+
+
+jobs:
+
+  sonarqube:
+    name: SonarQube
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  
+      - name: SonarQubeScan
+        uses: SonarSource/sonarqube-scan-action@v6
+        env: 
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+
+    # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
+    - name: Update dependency graph
+      uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
+	  
+  sync-trivy-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: setup-oras
+        uses: oras-project/setup-oras@v1.2.3
+
+      - name: Login to GitHub Packages Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Copy Trivy Checks
+        run: |
+          oras cp ghcr.io/aquasecurity/trivy-checks:1 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+		  
+	
+   azure_build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+
+    - name: Azure Login
+      uses: azure/login@14a755a4e2fd6dff25794233def4f2cf3f866955
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Build image on ACR
+      uses: azure/CLI@61bb69d64d613b52663984bf12d6bac8fd7b3cc8
+      with:
+        azcliversion: 2.29.1
+        inlineScript: |
+          az configure --defaults acr=${{ env.AZURE_CONTAINER_REGISTRY }}
+          az acr build -t -t ${{ env.REGISTRY_URL }}/${{ env.PROJECT_NAME }}:${{ github.sha }}
+
+    - name: Gets K8s context
+      uses: azure/aks-set-context@94ccc775c1997a3fcfbfbce3c459fec87e0ab188
+      with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          resource-group: ${{ env.RESOURCE_GROUP }}
+          cluster-name: ${{ env.CLUSTER_NAME }}
+      id: login
+
+    - name: Configure deployment
+      uses: azure/k8s-bake@61041e8c2f75c1f01186c8f05fb8b24e1fc507d8
+      with:
+        renderEngine: 'helm'
+        helmChart: ${{ env.CHART_PATH }}
+        overrideFiles: ${{ env.CHART_OVERRIDE_PATH }}
+        overrides: |
+          replicas:2
+        helm-version: 'latest'
+      id: bake
+
+    - name: Deploys application
+      uses: Azure/k8s-deploy@dd4bbd13a5abd2fc9ca8bdcb8aee152bb718fa78
+      with:
+        manifests: ${{ steps.bake.outputs.manifestsBundle }}
+        images: |
+          ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.PROJECT_NAME }}:${{ github.sha }}
+        imagepullsecrets: |
+          ${{ env.PROJECT_NAME }}
