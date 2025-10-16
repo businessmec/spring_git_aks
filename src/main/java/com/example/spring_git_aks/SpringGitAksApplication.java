@@ -5,9 +5,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class SpringGitAksApplication {
+    String information = "information";
 
-	public static void main(String[] args) {
-		SpringApplication.run(SpringGitAksApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(SpringGitAksApplication.class, args);
+    }
 
 }
