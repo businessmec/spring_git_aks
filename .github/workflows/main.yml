@@ -11,8 +11,6 @@ env:
   # If you bake using helm:
   CHART_PATH: MY_HELM_FILE                   # set this to the path to your helm file
   CHART_OVERRIDE_PATH: MY_OVERRIDE_FILES     # set this to an array of override file paths
-  
-    IMAGE_NAME: ${{ github.repository_owner }}/trivy-checks-act
   REGISTRY: ghcr.io
 
   
