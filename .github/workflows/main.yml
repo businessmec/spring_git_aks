@@ -20,7 +20,9 @@ on:
   push:
     branches: [ "main" ]
 
+
 jobs:
+
   sonarqube:
     name: SonarQube
     runs-on: ubuntu-latest
@@ -48,9 +50,9 @@ jobs:
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph
-      uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
+      #uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
 	  
-  synctrivychecks:
+  sync-trivy-checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -69,7 +71,7 @@ jobs:
           oras cp ghcr.io/aquasecurity/trivy-checks:1 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 		  
 	
-  azurebuild:
+  azure_build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
