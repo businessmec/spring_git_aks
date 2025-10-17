@@ -17,9 +17,7 @@ env:
   REGISTRY: ghcr.io
 
 
-on:
-  push:
-    branches: [ "main" ]
+on:  push
 
 
 jobs:
