@@ -1,0 +1,151 @@
+
+name: Java CI with Maven and push to AKS
+
+
+env:
+  AZURE_CONTAINER_REGISTRY: MY_REGISTRY_NAME # set this to the name of your container registry
+  PROJECT_NAME: MY_PROJECT_NAME              # set this to your project's name
+  RESOURCE_GROUP: MY_RESOURCE_GROUP          # set this to the resource group containing your AKS cluster
+  CLUSTER_NAME: MY_CLUSTER_NAME              # set this to the name of your AKS cluster
+  REGISTRY_URL: MY_REGISTRY_URL              # set this to the URL of your registry
+  # If you bake using helm:
+  CHART_PATH: MY_HELM_FILE                   # set this to the path to your helm file
+  CHART_OVERRIDE_PATH: MY_OVERRIDE_FILES     # set this to an array of override file paths    
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
+ #   IMAGE_NAME: ${{ github.repository_owner }}/trivy-checks-act
+  REGISTRY: ghcr.io
+
+  
+on:
+  push:
+    branches: [ "main" ]
+
+
+jobs:
+
+  sonarqube:
+    name: SonarQube
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  
+      - name: SonarQubeScan
+        uses: SonarSource/sonarqube-scan-action@v6
+        env: 
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          
+  build:
+    name: install java Maven
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    - name: Build with Maven
+      run: mvn clean install
+
+    - name: Upload artifact for deployment job
+      uses: actions/upload-artifact@v4
+      with:
+          name: java-app
+          path: '${{ github.workspace }}/target/*.jar'
+
+
+
+  sync-trivy-checks:
+    runs-on: ubuntu-latest
+    name: Scan nginx:latest with Trivy
+
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set Date
+        id: set-date
+        run: echo "DATE=$(date +%m.%d.%Y)" >> $GITHUB_ENV
+
+      - name: Create output directory
+        run: mkdir -p "GitHub Actions/Trivy Automation"
+
+      - name: Install Trivy
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.57.0
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Download Trivy vulnerability database
+        run: trivy image --download-db-only
+
+      - name: Run Trivy vulnerability scanner
+        run: |
+          OUTPUT_FILE="GitHub Actions/Trivy Automation/scan-results-${DATE}.json"
+          mkdir -p "GitHub Actions/Trivy Automation"
+          trivy image --format json --ignore-unfixed --vuln-type os,library --severity CRITICAL,HIGH,MEDIUM,LOW -o "$OUTPUT_FILE" nginx:latest
+
+      - name: Verify scan results exist
+        run: ls -l "GitHub Actions/Trivy Automation/"
+
+      - name: Commit scan results to repository
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add "GitHub Actions/Trivy Automation/scan-results-${DATE}.json"
+          git commit -m "Add Trivy scan results (${DATE})"
+          git push origin HEAD:main
+          
+
+  azure-build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+
+    - name: Azure Login
+      uses: azure/login@14a755a4e2fd6dff25794233def4f2cf3f866955
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Build image on ACR
+      uses: azure/CLI@61bb69d64d613b52663984bf12d6bac8fd7b3cc8
+      with:
+        azcliversion: 2.29.1
+        inlineScript: |
+          az configure --defaults acr=${{ env.AZURE_CONTAINER_REGISTRY }}
+          az acr build -t -t ${{ env.REGISTRY_URL }}/${{ env.PROJECT_NAME }}:${{ github.sha }}
+
+    - name: Gets K8s context
+      uses: azure/aks-set-context@94ccc775c1997a3fcfbfbce3c459fec87e0ab188
+      with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          resource-group: ${{ env.RESOURCE_GROUP }}
+          cluster-name: ${{ env.CLUSTER_NAME }}
+      id: login
+
+    - name: Configure deployment
+      uses: azure/k8s-bake@61041e8c2f75c1f01186c8f05fb8b24e1fc507d8
+      with:
+        renderEngine: 'helm'
+        helmChart: ${{ env.CHART_PATH }}
+        overrideFiles: ${{ env.CHART_OVERRIDE_PATH }}
+        overrides: |
+          replicas:2
+        helm-version: 'latest'
+      id: bake
+
+    - name: Deploys application
+      uses: Azure/k8s-deploy@dd4bbd13a5abd2fc9ca8bdcb8aee152bb718fa78
+      with:
+        manifests: ${{ steps.bake.outputs.manifestsBundle }}
+        images: |
+          ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.PROJECT_NAME }}:${{ github.sha }}
+        imagepullsecrets: |
+          ${{ env.PROJECT_NAME }}
