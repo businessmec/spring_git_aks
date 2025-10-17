@@ -104,7 +104,7 @@ jobs:
           git push origin HEAD:main
 		  
 	
-  azure_build:
+  azure-build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
