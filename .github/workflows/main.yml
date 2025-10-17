@@ -36,6 +36,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           
   build:
+    name: install java Maven
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -45,12 +46,12 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
-     - name: Build with Maven
-        run: mvn clean install
+    - name: Build with Maven
+      run: mvn clean install
 
-     - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
-        with:
+    - name: Upload artifact for deployment job
+      uses: actions/upload-artifact@v4
+      with:
           name: java-app
           path: '${{ github.workspace }}/target/*.jar'
 
