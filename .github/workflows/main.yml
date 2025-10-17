@@ -102,8 +102,8 @@ jobs:
           git add "GitHub Actions/Trivy Automation/scan-results-${DATE}.json"
           git commit -m "Add Trivy scan results (${DATE})"
           git push origin HEAD:main
-		  
-	
+          
+
   azure-build:
     runs-on: ubuntu-latest
     steps:
