@@ -61,7 +61,7 @@ jobs:
   sync-trivy-checks:
     runs-on: ubuntu-latest
     name: Scan nginx:latest with Trivy
-    runs-on: ubuntu-20.04
+
 
     steps:
       - name: Checkout repository
