@@ -123,7 +123,7 @@ jobs:
           azcliversion: 2.29.1
           inlineScript: |
             az configure --defaults acr=${{ env.AZURE_CONTAINER_REGISTRY }}
-            az acr build  --image ${{ env.PROJECT_NAME }}:${{ github.sha }} --registry {{ env.AZURE_CONTAINER_REGISTRY }} .
+            az acr build  --image check/${{ env.PROJECT_NAME }}:${{ github.sha }} --registry {{ env.AZURE_CONTAINER_REGISTRY }} .
             
             #az acr build -t ${{ env.REGISTRY_URL }}/${{ env.PROJECT_NAME }}:${{ github.sha }} .
             
