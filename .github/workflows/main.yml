@@ -111,8 +111,9 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Azure Login
-        uses: azure/login@14a755a4e2fd6dff25794233def4f2cf3f866955
+      - name: Azure login
+        id: login
+        uses: azure/login@v1.4.3
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
