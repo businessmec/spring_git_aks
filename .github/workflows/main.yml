@@ -131,6 +131,9 @@ jobs:
               #folder: spring_git_aks
               branch: raw_code
               tag: ${{ github.sha }}
+              name: java-app
+              path: '${{ github.workspace }}/target/*.jar'
+
       - name: Build image on ACR
         uses: azure/CLI@61bb69d64d613b52663984bf12d6bac8fd7b3cc8
         with:
