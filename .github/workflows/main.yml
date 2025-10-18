@@ -58,6 +58,29 @@ jobs:
           name: java-app
           path: '${{ github.workspace }}/target/*.jar'
 
+      - name: Azure login
+        id: connect_azure
+        uses: azure/login@v1.4.3
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+
+      - name: Build image on ACR
+        id: build-push-acr
+        uses: azure/acr-build@v1
+        with:
+          service_principal: ${{ secrets.SERVICE_PRINCIPAL }}
+          service_principal_password: ${{ secrets.SERVICE_PRINCIPAL_PASSWORD }}
+          tenant: ${{ secrets.AZURE_TENANT }}
+          registry: ${{ env.AZURE_CONTAINER_REGISTRY }}
+          repository: azuredocs
+          image: spring_git_aks
+          #folder: spring_git_aks
+          branch: raw_code
+          tag: ${{ github.sha }}
+          name: java-app
+          path: '${{ github.workspace }}/target/*.jar'
+
 
 
   sync-trivy-checks:
@@ -110,7 +133,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-
       - name: Azure login
         id: connect_azure
         uses: azure/login@v1.4.3
