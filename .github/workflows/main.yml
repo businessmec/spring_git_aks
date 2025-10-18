@@ -3,11 +3,11 @@ name: Java CI with Maven and push to AKS
 
 
 env:
-  AZURE_CONTAINER_REGISTRY: MY_REGISTRY_NAME # set this to the name of your container registry
+  AZURE_CONTAINER_REGISTRY: githubtchiroma # set this to the name of your container registry
   PROJECT_NAME: MY_PROJECT_NAME              # set this to your project's name
-  RESOURCE_GROUP: MY_RESOURCE_GROUP          # set this to the resource group containing your AKS cluster
-  CLUSTER_NAME: MY_CLUSTER_NAME              # set this to the name of your AKS cluster
-  REGISTRY_URL: MY_REGISTRY_URL              # set this to the URL of your registry
+  RESOURCE_GROUP: ckad_resource_group          # set this to the resource group containing your AKS cluster
+  CLUSTER_NAME: githubakscluster              # set this to the name of your AKS cluster
+  REGISTRY_URL: githubtchiroma.azurecr.io              # set this to the URL of your registry
   # If you bake using helm:
   CHART_PATH: MY_HELM_FILE                   # set this to the path to your helm file
   CHART_OVERRIDE_PATH: MY_OVERRIDE_FILES     # set this to an array of override file paths
@@ -39,10 +39,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
           cache: maven
 
@@ -148,6 +148,6 @@ jobs:
         with:
           manifests: ${{ steps.bake.outputs.manifestsBundle }}
           images: |
-            ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.PROJECT_NAME }}:${{ github.sha }}
+            ${{ env.AZURE_CONTAINER_REGISTRY }}/${{ env.PROJECT_NAME }}:${{ github.sha }}
           imagepullsecrets: |
             ${{ env.PROJECT_NAME }}
