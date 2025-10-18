@@ -126,8 +126,8 @@ jobs:
               service_principal: ${{ secrets.SERVICE_PRINCIPAL }}
               service_principal_password: ${{ secrets.SERVICE_PRINCIPAL_PASSWORD }}
               tenant: ${{ secrets.AZURE_TENANT }}
-              #registry: ${{ env.AZURE_CONTAINER_REGISTRY }}
-              registry: ${{ env.REGISTRY_URL }}
+              registry: ${{ env.AZURE_CONTAINER_REGISTRY }}
+
               repository: azuredocs
               image: spring_git_aks
               folder: spring_git_aks
