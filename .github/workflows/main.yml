@@ -81,6 +81,7 @@ jobs:
           tag: ${{ github.sha }}
           name: java-app
           path: '${{ github.workspace }}/target/*.jar'
+          context : .
 
 
 
