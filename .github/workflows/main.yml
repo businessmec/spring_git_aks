@@ -74,7 +74,7 @@ jobs:
           service_principal_password: ${{ secrets.SERVICE_PRINCIPAL_PASSWORD }}
           tenant: ${{ secrets.AZURE_TENANT }}
           registry: ${{ env.AZURE_CONTAINER_REGISTRY }}
-          #repository: azuredocs
+          repository: dindonneau
           image: spring_git_aks
           #folder: spring_git_aks
           branch: raw_code
