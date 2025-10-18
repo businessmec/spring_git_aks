@@ -131,7 +131,7 @@ jobs:
               repository: azuredocs
               image: spring_git_aks
               folder: spring_git_aks
-              branch: ${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+              branch: raw_code
               tag: ${{ github.sha }}
       - name: Build image on ACR
         uses: azure/CLI@61bb69d64d613b52663984bf12d6bac8fd7b3cc8
