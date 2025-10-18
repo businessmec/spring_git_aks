@@ -117,9 +117,8 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Build image on ACR
-        uses: actions/checkout@v3
-      - name: ACR build
+
+      - name:  Build image on ACR
         id: build-push-acr
         uses: azure/acr-build@v1
         with:
@@ -127,7 +126,6 @@ jobs:
               service_principal_password: ${{ secrets.SERVICE_PRINCIPAL_PASSWORD }}
               tenant: ${{ secrets.AZURE_TENANT }}
               registry: ${{ env.AZURE_CONTAINER_REGISTRY }}
-
               repository: azuredocs
               image: spring_git_aks
               folder: spring_git_aks
