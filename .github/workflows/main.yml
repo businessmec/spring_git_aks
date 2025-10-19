@@ -146,11 +146,13 @@ jobs:
         uses: azure/CLI@61bb69d64d613b52663984bf12d6bac8fd7b3cc8
         with:
           azcliversion: 2.29.1
-          context: .
+
           inlineScript: |
             az configure --defaults acr=${{ env.REGISTRY_URL }}
             echo ${{ env.PROJECT_NAME }}:${{ github.sha }}
             echo  ${{ env.AZURE_CONTAINER_REGISTRY }}
+            az login --service-principal -u ${{ secrets.SERVICE_PRINCIPAL }} -p $AZURE_SECRET --tenant $AZURE_TENANT
+
             az acr build  --registry ${{ env.AZURE_CONTAINER_REGISTRY }} --image check/${{ env.PROJECT_NAME }}:${{ github.sha }} --resource-group ${{ env.RESOURCE_GROUP }} .
             
             
