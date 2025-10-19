@@ -151,7 +151,7 @@ jobs:
             az configure --defaults acr=${{ env.REGISTRY_URL }}
             echo ${{ env.PROJECT_NAME }}:${{ github.sha }}
             echo  ${{ env.AZURE_CONTAINER_REGISTRY }}
-            az login --service-principal --username ${{ secrets.SERVICE_PRINCIPAL }} --password ${{  secrets.SERVICE_PRINCIPAL_PASSWORD }} --tenant ${{ secret.AZURE_TENANT }}
+            az login --service-principal --username ${{ secrets.SERVICE_PRINCIPAL }} --password ${{  secrets.SERVICE_PRINCIPAL_PASSWORD }} --tenant ${{ secrets.AZURE_TENANT }}
 
             az acr build  --registry ${{ env.AZURE_CONTAINER_REGISTRY }} --image check/${{ env.PROJECT_NAME }}:${{ github.sha }} --resource-group ${{ env.RESOURCE_GROUP }} .
             
