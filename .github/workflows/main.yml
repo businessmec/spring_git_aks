@@ -142,23 +142,6 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-
-      - name:  Build image on ACR
-        id: build-push-acr
-        uses: azure/acr-build@v1
-        with:
-              service_principal: ${{ secrets.SERVICE_PRINCIPAL }}
-              service_principal_password: ${{ secrets.SERVICE_PRINCIPAL_PASSWORD }}
-              tenant: ${{ secrets.AZURE_TENANT }}
-              registry: ${{ env.AZURE_CONTAINER_REGISTRY }}
-              repository: azuredocs
-              image: spring_git_aks
-              #folder: spring_git_aks
-              branch: raw_code
-              tag: ${{ github.sha }}
-              name: java-app
-              path: '${{ github.workspace }}/target/*.jar'
-
       - name: Build image on ACR
         uses: azure/CLI@61bb69d64d613b52663984bf12d6bac8fd7b3cc8
         with:
