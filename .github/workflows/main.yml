@@ -142,11 +142,16 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name : download jar to target
+        uses: actions/download-artifact@v1
+        with:
+            name: jar-artifact
+            path: target/
+
       - name: Build image on ACR
         uses: azure/CLI@61bb69d64d613b52663984bf12d6bac8fd7b3cc8
         with:
           azcliversion: 2.29.1
-
           inlineScript: |
             az configure --defaults acr=${{ env.REGISTRY_URL }}
             echo ${{ env.PROJECT_NAME }}:${{ github.sha }}
