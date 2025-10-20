@@ -9,6 +9,8 @@ LABEL maintainer="business@yahoo.fr"
 WORKDIR /home
 
 RUN echo $(ls -l )
-ADD /home/runner/work/spring_git_aks/spring_git_aks/shuna.jar /home/
+
+COPY --from=builder /app/target/*.jar ./home/shuna.jar
+
 
 CMD ["java","-jar","/home/shuna.jar"]
