@@ -145,7 +145,7 @@ jobs:
       - name : download jar to target
         uses: actions/download-artifact@v4
         with:
-            name: jar-artifact
+            name: java-app
             path: target/
 
       - name: Build image on ACR
