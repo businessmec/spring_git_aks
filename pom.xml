@@ -92,6 +92,8 @@
 				<version>0.8.11</version>
 			</plugin>
 		</plugins>
+		<finalName>shuna.jar</finalName>
 	</build>
+
 
 </project>

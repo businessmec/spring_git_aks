@@ -57,7 +57,7 @@ jobs:
         with:
           context : .
           name: java-app
-          path: '${{ github.workspace }}/target/*.jar'
+          path: '${{ github.workspace }}/target/shuna*.jar'
           retention-days: 1
 
       - name: Azure login
