@@ -1,3 +1,9 @@
+# Stage 1: Build the JAR file
+FROM maven:3.8.7-eclipse-temurin-17 AS builder
+WORKDIR /app
+COPY . .
+RUN mvn package -DskipTests
+
 FROM openjdk:17-oracle
 LABEL maintainer="business@yahoo.fr"
 WORKDIR /home
