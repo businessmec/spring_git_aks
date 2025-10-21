@@ -14,6 +14,7 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   IMAGE_NAME: ${{ github.repository_owner }}/trivy-java-db-act
+  IMAGE_TAG: github.sha
 
 
   #   IMAGE_NAME: ${{ github.repository_owner }}/trivy-checks-act
@@ -91,7 +92,7 @@ jobs:
           image: spring_git_aks
           #folder: spring_git_aks
           branch: raw_code
-          tag: ${{ github.sha }}
+          tag: ${{ IMAGE_TAG }}
           #build_args: 'ARTIFACT_NAME=target/spring_git_aks-0.0.1-SNAPSHOT.jar'
           path: '${{ github.workspace }}/target/*.jar'
 
@@ -110,7 +111,7 @@ jobs:
       - name: Run Trivy scan
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ env.REGISTRY_URL }}/dindonneau/${{ env.PROJECT_NAME }}:${{ github.sha }}
+          image-ref: ${{ env.REGISTRY_URL }}/dindonneau/${{ env.PROJECT_NAME }}:${{ IMAGE_TAG }}
           format: "table"
           exit-code: 1
           ignore-unfixed: true
@@ -189,7 +190,7 @@ jobs:
             echo  ${{ env.AZURE_CONTAINER_REGISTRY }}
             az login --service-principal --username ${{ secrets.SERVICE_PRINCIPAL }} --password ${{  secrets.SERVICE_PRINCIPAL_PASSWORD }} --tenant ${{ secrets.AZURE_TENANT }}
 
-            az acr build  --registry ${{ env.AZURE_CONTAINER_REGISTRY }} --image check/${{ env.PROJECT_NAME }}:${{ github.sha }} --resource-group ${{ env.RESOURCE_GROUP }} .
+            az acr build  --registry ${{ env.AZURE_CONTAINER_REGISTRY }} --image check/${{ env.PROJECT_NAME }}:${{ IMAGE_TAG }} --resource-group ${{ env.RESOURCE_GROUP }} .
             
             
             
