@@ -103,7 +103,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Run Trivy scan
-        if: ${{ inputs.environment == 'prod' }}
+
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ env.REGISTRY_URL }}/check/${{ env.PROJECT_NAME }}:${{ github.sha }}
