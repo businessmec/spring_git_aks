@@ -14,7 +14,8 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   IMAGE_NAME: ${{ github.repository_owner }}/trivy-java-db-act
-  IMAGE_TAG: ${{ github.sha }}
+  #IMAGE_TAG: ${{ github.sha }}
+  IMAGE_TAG: ebd446dd6af7478a41cc1636bb5485da95b45235
 
 
   #   IMAGE_NAME: ${{ github.repository_owner }}/trivy-checks-act
