@@ -111,14 +111,14 @@ jobs:
         uses: azure/login@v1.4.3
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-      - name: Run Trivy scan
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: ${{ env.REGISTRY_URL }}/dindonneau/${{ env.PROJECT_NAME }}:${{ env.IMAGE_TAG }}
-          format: "table"
-          exit-code: 1
-          ignore-unfixed: true
-          severity: "CRITICAL,HIGH"
+   #   - name: Run Trivy scan
+   #     uses: aquasecurity/trivy-action@master
+   #     with:
+   #       image-ref: ${{ env.REGISTRY_URL }}/dindonneau/${{ env.PROJECT_NAME }}:${{ env.IMAGE_TAG }}
+   #       format: "table"
+   #       exit-code: 1
+   #       ignore-unfixed: true
+   #       severity: "CRITICAL,HIGH"
       - name: install docker trivy
         run: |
           docker pull aquasec/trivy:canary
