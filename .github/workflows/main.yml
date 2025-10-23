@@ -14,8 +14,8 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   IMAGE_NAME: ${{ github.repository_owner }}/trivy-java-db-act
-  IMAGE_TAG: ${{ github.sha }}
-  #IMAGE_TAG: 1a79847513e6129677c8258e600e02a5c885c344
+  #IMAGE_TAG: ${{ github.sha }}
+  IMAGE_TAG: b918f6043c027920165e470818a728991c13b3ad
 
 
   #   IMAGE_NAME: ${{ github.repository_owner }}/trivy-checks-act
@@ -75,8 +75,6 @@ jobs:
       - name: download jar to target
         uses: actions/download-artifact@v4
         with:
-          context: .
-
           name: java-app
           path: target/
 
@@ -95,8 +93,7 @@ jobs:
           #folder: spring_git_aks
           branch: raw_code
           tag: ${{ env.IMAGE_TAG }}
-          #build_args: 'ARTIFACT_NAME=target/spring_git_aks-0.0.1-SNAPSHOT.jar'
-          path: '${{ github.workspace }}/target/*.jar'
+
 
 
   trivy_scan:
