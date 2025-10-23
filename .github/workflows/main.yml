@@ -125,7 +125,7 @@ jobs:
 
       - name: docker run trivy
         run: |
-          docker pull -e AZURE_CLIENT_ID=${{ secrets.SERVICE_PRINCIPAL }} -e AZURE_CLIENT_SECRET=${{ secrets.SERVICE_PRINCIPAL_PASSWORD }} -e AZURE_TENANT_ID=${{ secrets.AZURE_TENANT }}githubtchiroma.azurecr.io/dindonneau/spring_git_aks:16431bd87bf13e1cb61458b8d032f77118f7281a
+          docker pull -e AZURE_CLIENT_ID=${{ secrets.SERVICE_PRINCIPAL }} -e AZURE_CLIENT_SECRET=${{ secrets.SERVICE_PRINCIPAL_PASSWORD }} -e AZURE_TENANT_ID=${{ secrets.AZURE_TENANT }} githubtchiroma.azurecr.io/dindonneau/spring_git_aks:16431bd87bf13e1cb61458b8d032f77118f7281a
           docker run --rm  -e AZURE_CLIENT_ID= ${{ secrets.SERVICE_PRINCIPAL }} -e AZURE_CLIENT_SECRET= ${{ secrets.SERVICE_PRINCIPAL_PASSWORD }} \  -e AZURE_TENANT_ID= ${{ secrets.AZURE_TENANT }} aquasec/trivy image ${{ env.REGISTRY_URL }}/dindonneau/${{ env.PROJECT_NAME }}:${{ env.IMAGE_TAG }}
       
 
