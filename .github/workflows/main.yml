@@ -123,7 +123,7 @@ jobs:
         run: |
           docker pull aquasec/trivy:canary
 
-      - name: install docker trivy
+      - name: docker run trivy
         run: |
           docker login githubtchiroma.azurecr.io --username ${{ secrets.SERVICE_PRINCIPAL }}  --password ${{ secrets.SERVICE_PRINCIPAL_PASSWORD }}
           docker run --rm  -e AZURE_CLIENT_ID= ${{ secrets.SERVICE_PRINCIPAL }} -e AZURE_CLIENT_SECRET= ${{ secrets.SERVICE_PRINCIPAL_PASSWORD }} \  -e AZURE_TENANT_ID= ${{ secrets.AZURE_TENANT }} aquasec/trivy image ${{ env.REGISTRY_URL }}/dindonneau/${{ env.PROJECT_NAME }}:${{ env.IMAGE_TAG }}
