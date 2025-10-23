@@ -105,7 +105,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Run Trivy vulnerability scanner
+      - name: install docker trivy
         run: |
           docker pull aquasec/trivy:canary
       - name: Azure login
