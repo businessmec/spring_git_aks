@@ -81,6 +81,7 @@ jobs:
           path: target/
 
 
+
       - name: Build image on ACR
         id: build-push-acr
         uses: azure/acr-build@v1
@@ -104,6 +105,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Run Trivy vulnerability scanner
+        run: |
+          docker pull aquasec/trivy:canary
       - name: Azure login
         id: connect_azure
         uses: azure/login@v1.4.3
